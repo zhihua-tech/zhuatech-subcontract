@@ -1,0 +1,453 @@
+{
+  "slug": "subcontract",
+  "pkg": "subcontract",
+  "name": "知华委外加工管理",
+  "subtitle": "加工订单、材料发出、合格收货与加工费",
+  "accent": "#52653d",
+  "modules": [
+    {
+      "key": "suppliers",
+      "label": "加工供应商",
+      "description": "供应商、联系人与质量准入",
+      "initial": "ACTIVE",
+      "editable": true,
+      "creatable": true,
+      "fields": [
+        {
+          "key": "name",
+          "label": "供应商",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "contact",
+          "label": "联系人",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        }
+      ],
+      "actions": [
+        {
+          "key": "suspend",
+          "label": "暂停合作",
+          "from": [
+            "ACTIVE"
+          ],
+          "to": "SUSPENDED",
+          "role": "REVIEWER",
+          "separate": false,
+          "fields": []
+        },
+        {
+          "key": "restore",
+          "label": "恢复合作",
+          "from": [
+            "SUSPENDED"
+          ],
+          "to": "ACTIVE",
+          "role": "REVIEWER",
+          "separate": false,
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "materials",
+      "label": "原料库存",
+      "description": "库存初始化后仅能通过流水调整",
+      "initial": "ACTIVE",
+      "editable": false,
+      "creatable": true,
+      "fields": [
+        {
+          "key": "name",
+          "label": "原料名称",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "unit",
+          "label": "单位",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "onHand",
+          "label": "初始库存",
+          "type": "number",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0",
+          "max": "999999999"
+        }
+      ],
+      "actions": [
+        {
+          "key": "receive",
+          "label": "补充原料入库",
+          "from": [
+            "ACTIVE"
+          ],
+          "to": "ACTIVE",
+          "fields": [
+            {
+              "key": "quantity",
+              "label": "入库数量",
+              "type": "number",
+              "required": true,
+              "ref": null,
+              "options": [],
+              "min": "0.0001",
+              "max": "999999999"
+            },
+            {
+              "key": "reference",
+              "label": "入库凭证号",
+              "type": "text",
+              "required": true,
+              "ref": null,
+              "options": [],
+              "min": null,
+              "max": null
+            }
+          ],
+          "role": "REVIEWER",
+          "separate": true
+        }
+      ]
+    },
+    {
+      "key": "orders",
+      "label": "委外订单",
+      "description": "用料定额、发料余额、收货与结算",
+      "initial": "DRAFT",
+      "editable": true,
+      "creatable": true,
+      "fields": [
+        {
+          "key": "supplier",
+          "label": "供应商",
+          "type": "ref",
+          "required": true,
+          "ref": "suppliers",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "material",
+          "label": "原料",
+          "type": "ref",
+          "required": true,
+          "ref": "materials",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "product",
+          "label": "成品名称",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "quantity",
+          "label": "订单数量",
+          "type": "integer",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "1",
+          "max": "1000000"
+        },
+        {
+          "key": "bomQty",
+          "label": "单位用料",
+          "type": "number",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0.0001",
+          "max": "999999999"
+        },
+        {
+          "key": "unitFee",
+          "label": "单位加工费",
+          "type": "money",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0.01",
+          "max": "999999999"
+        }
+      ],
+      "actions": [
+        {
+          "key": "approve",
+          "label": "审批下达",
+          "from": [
+            "DRAFT"
+          ],
+          "to": "ACTIVE",
+          "role": "REVIEWER",
+          "separate": true,
+          "fields": []
+        },
+        {
+          "key": "issue",
+          "label": "发出原料",
+          "from": [
+            "ACTIVE"
+          ],
+          "to": "ACTIVE",
+          "role": "OPERATOR",
+          "separate": false,
+          "fields": [
+            {
+              "key": "quantity",
+              "label": "发料数量",
+              "type": "number",
+              "required": true,
+              "ref": null,
+              "options": [],
+              "min": "0.0001",
+              "max": "999999999"
+            }
+          ]
+        },
+        {
+          "key": "returnMaterial",
+          "label": "退回余料",
+          "from": [
+            "ACTIVE"
+          ],
+          "to": "ACTIVE",
+          "role": "OPERATOR",
+          "separate": false,
+          "fields": [
+            {
+              "key": "quantity",
+              "label": "退料数量",
+              "type": "number",
+              "required": true,
+              "ref": null,
+              "options": [],
+              "min": "0.0001",
+              "max": "999999999"
+            }
+          ]
+        },
+        {
+          "key": "close",
+          "label": "核对结清",
+          "from": [
+            "ACTIVE"
+          ],
+          "to": "CLOSED",
+          "role": "REVIEWER",
+          "separate": true,
+          "fields": []
+        },
+        {
+          "key": "cancel",
+          "label": "作废",
+          "from": [
+            "DRAFT"
+          ],
+          "to": "CANCELLED",
+          "role": "OPERATOR",
+          "separate": false,
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "receipts",
+      "label": "加工收货",
+      "description": "区分合格与不合格数量并自动扣耗材料",
+      "initial": "DRAFT",
+      "editable": true,
+      "creatable": true,
+      "fields": [
+        {
+          "key": "order",
+          "label": "加工订单",
+          "type": "ref",
+          "required": true,
+          "ref": "orders",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "accepted",
+          "label": "合格数量",
+          "type": "integer",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0",
+          "max": "1000000"
+        },
+        {
+          "key": "rejected",
+          "label": "不合格数量",
+          "type": "integer",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0",
+          "max": "1000000"
+        },
+        {
+          "key": "inspection",
+          "label": "检验说明",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        }
+      ],
+      "actions": [
+        {
+          "key": "post",
+          "label": "验收入库",
+          "from": [
+            "DRAFT"
+          ],
+          "to": "POSTED",
+          "role": "REVIEWER",
+          "separate": true,
+          "fields": []
+        }
+      ]
+    },
+    {
+      "key": "movements",
+      "label": "材料流水",
+      "description": "发料、扣耗、退料和成品入库数量",
+      "initial": "POSTED",
+      "editable": false,
+      "creatable": false,
+      "fields": [
+        {
+          "key": "order",
+          "label": "订单",
+          "type": "ref",
+          "required": false,
+          "ref": "orders",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "material",
+          "label": "原料",
+          "type": "ref",
+          "required": true,
+          "ref": "materials",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "quantity",
+          "label": "数量",
+          "type": "number",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0",
+          "max": "999999999"
+        },
+        {
+          "key": "kind",
+          "label": "流水类型",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        }
+      ],
+      "actions": []
+    },
+    {
+      "key": "payments",
+      "label": "加工费结算",
+      "description": "合格收货计价与付款上限校验",
+      "initial": "DRAFT",
+      "editable": true,
+      "creatable": true,
+      "fields": [
+        {
+          "key": "order",
+          "label": "委外订单",
+          "type": "ref",
+          "required": true,
+          "ref": "orders",
+          "options": [],
+          "min": null,
+          "max": null
+        },
+        {
+          "key": "amount",
+          "label": "本次支付",
+          "type": "money",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": "0.01",
+          "max": "999999999"
+        },
+        {
+          "key": "reference",
+          "label": "付款凭证号",
+          "type": "text",
+          "required": true,
+          "ref": null,
+          "options": [],
+          "min": null,
+          "max": null
+        }
+      ],
+      "actions": [
+        {
+          "key": "pay",
+          "label": "审核付款",
+          "from": [
+            "DRAFT"
+          ],
+          "to": "PAID",
+          "role": "REVIEWER",
+          "separate": true,
+          "fields": []
+        }
+      ]
+    }
+  ]
+}

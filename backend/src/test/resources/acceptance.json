@@ -1,0 +1,257 @@
+[
+  {
+    "op": "create",
+    "as": "supplier",
+    "module": "suppliers",
+    "data": {
+      "name": "精密加工协作厂",
+      "contact": "项目经理（演示）"
+    }
+  },
+  {
+    "op": "create",
+    "as": "material",
+    "module": "materials",
+    "data": {
+      "name": "铝合金毛坯",
+      "unit": "kg",
+      "onHand": 100
+    }
+  },
+  {
+    "op": "create",
+    "as": "order",
+    "module": "orders",
+    "data": {
+      "supplier": "$supplier.id",
+      "material": "$material.id",
+      "product": "外壳组件",
+      "quantity": 10,
+      "bomQty": 2,
+      "unitFee": 30
+    }
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "approve",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "issue",
+    "data": {
+      "quantity": 21
+    },
+    "error": 409
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "issue",
+    "data": {
+      "quantity": 20
+    }
+  },
+  {
+    "op": "check",
+    "target": "material",
+    "expect": {
+      "data.onHand": 80
+    }
+  },
+  {
+    "op": "create",
+    "as": "r1",
+    "module": "receipts",
+    "data": {
+      "order": "$order.id",
+      "accepted": 6,
+      "rejected": 0,
+      "inspection": "尺寸和外观检验合格"
+    }
+  },
+  {
+    "op": "action",
+    "target": "r1",
+    "action": "post",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "order",
+    "expect": {
+      "data.outside": 8,
+      "data.accepted": 6,
+      "data.payable": 180
+    }
+  },
+  {
+    "op": "create",
+    "as": "tooMuch",
+    "module": "receipts",
+    "data": {
+      "order": "$order.id",
+      "accepted": 5,
+      "rejected": 0,
+      "inspection": "超额收货测试"
+    }
+  },
+  {
+    "op": "action",
+    "target": "tooMuch",
+    "action": "post",
+    "data": {},
+    "role": "reviewer",
+    "error": 409
+  },
+  {
+    "op": "create",
+    "as": "overPay",
+    "module": "payments",
+    "data": {
+      "order": "$order.id",
+      "amount": 181,
+      "reference": "PAY-OVER"
+    }
+  },
+  {
+    "op": "action",
+    "target": "overPay",
+    "action": "pay",
+    "data": {},
+    "role": "reviewer",
+    "error": 409
+  },
+  {
+    "op": "create",
+    "as": "p1",
+    "module": "payments",
+    "data": {
+      "order": "$order.id",
+      "amount": 180,
+      "reference": "PAY-001"
+    }
+  },
+  {
+    "op": "action",
+    "target": "p1",
+    "action": "pay",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "close",
+    "data": {},
+    "role": "reviewer",
+    "error": 409
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "returnMaterial",
+    "data": {
+      "quantity": 9
+    },
+    "error": 409
+  },
+  {
+    "op": "create",
+    "as": "r2",
+    "module": "receipts",
+    "data": {
+      "order": "$order.id",
+      "accepted": 3,
+      "rejected": 1,
+      "inspection": "1 件划伤不合格"
+    }
+  },
+  {
+    "op": "action",
+    "target": "r2",
+    "action": "post",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "order",
+    "expect": {
+      "data.outside": 0,
+      "data.accepted": 9,
+      "data.rejected": 1,
+      "data.payable": 270
+    }
+  },
+  {
+    "op": "create",
+    "as": "p2",
+    "module": "payments",
+    "data": {
+      "order": "$order.id",
+      "amount": 90,
+      "reference": "PAY-002"
+    }
+  },
+  {
+    "op": "action",
+    "target": "p2",
+    "action": "pay",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "action",
+    "target": "order",
+    "action": "close",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "order",
+    "expect": {
+      "state": "CLOSED",
+      "data.paid": 270
+    }
+  },
+  {
+    "op": "count",
+    "module": "movements",
+    "count": 5,
+    "where": {}
+  },
+  {
+    "op": "action",
+    "target": "material",
+    "action": "receive",
+    "data": {
+      "quantity": 50,
+      "reference": "MAT-RESTOCK001"
+    },
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "material",
+    "expect": {
+      "data.onHand": 130
+    }
+  },
+  {
+    "op": "action",
+    "target": "material",
+    "action": "receive",
+    "data": {
+      "quantity": 50,
+      "reference": "MAT-RESTOCK001"
+    },
+    "role": "reviewer",
+    "error": 409
+  }
+]
