@@ -7,15 +7,45 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import static cn.zhuatech.subcontract.Model.*;
 import static cn.zhuatech.subcontract.Engine.*;
+/**
+ * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+ */
 @Component public class Domain {
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static Map<String,Object> copy(Row r){return new LinkedHashMap<>(r.data());}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static BigDecimal n(Row r,String k){return num(r.data(),k);}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static BigDecimal z(Map<String,Object>d,String k){return d.containsKey(k)?num(d,k):BigDecimal.ZERO;}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static String t(Row r,String k){return txt(r.data(),k);}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static List<Row> linked(Engine e,User u,String module,String key,String id){return e.all(u,module).stream().filter(r->t(r,key).equals(id)).toList();}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static void unique(Engine e,User u,String module,Map<String,Object>d,String key){require(e.all(u,module).stream().noneMatch(r->t(r,key).equalsIgnoreCase(txt(d,key))),"重复的"+key);}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static void dates(Map<String,Object>d,String from,String to){require(!date(d,to).isBefore(date(d,from)),"结束日期不能早于开始日期");}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static void change(Engine e,User u,Row row,String state,Map<String,Object>d,String note){e.save(u,row,state,d,"LINKED",note);}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public void edit(Engine e,User u,Row r,Map<String,Object>d){
   if(r.module().equals("readings")){require(e.ref(u,r.data(),"job","jobs").state().equals("RUNNING")&&txt(d,"job").equals(t(r,"job")),"仅进行中的任务可以修改测量值，且不得迁移任务");require(linked(e,u,"readings","job",t(r,"job")).stream().noneMatch(x->!x.id().equals(r.id())&&t(x,"point").equals(txt(d,"point"))),"测量点编号重复");return;}
   if(r.module().equals("versions")){require(e.ref(u,r.data(),"artwork","artworks").state().equals("DRAFT"),"已送审稿件不可修改");require(txt(d,"artwork").equals(t(r,"artwork"))&&num(d,"revision").compareTo(n(r,"revision"))==0,"版本不能迁移任务或改写版本号");return;}
@@ -38,10 +68,19 @@ import static cn.zhuatech.subcontract.Engine.*;
   if(r.module().equals("products")){String barcode=txt(d,"barcode");require(barcode.matches("\\d{13}"),"条码须为 EAN-13");int sum=0;for(int x=0;x<12;x++)sum+=(barcode.charAt(x)-'0')*(x%2==0?1:3);require((10-sum%10)%10==barcode.charAt(12)-'0',"EAN-13 校验位不正确");}
 
  }
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public Map<String,Object> metrics(Engine e,User u){
   var out=new LinkedHashMap<String,Object>();out.put("加工中订单",e.all(u,"orders").stream().filter(r->r.state().equals("ACTIVE")).count());out.put("待付加工费",e.all(u,"orders").stream().map(r->z(r.data(),"payable").subtract(z(r.data(),"paid"))).reduce(BigDecimal.ZERO,BigDecimal::add));out.put("供应商在外原料",e.all(u,"orders").stream().map(r->z(r.data(),"outside")).reduce(BigDecimal.ZERO,BigDecimal::add));;return out;
  }
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public void create(Engine e,User u,String module,Map<String,Object>d){switch(module){case "orders" -> {require(e.ref(u,d,"supplier","suppliers").state().equals("ACTIVE"),"供应商已暂停");for(String key:List.of("outside","accepted","rejected","payable","paid"))d.put(key,0);} default -> {} }}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public String action(Engine e,User u,Row r,String action,Map<String,Object>i,Map<String,Object>d){
   String k=r.module()+"."+action;switch(k){
 case "orders.approve" -> require(e.ref(u,d,"supplier","suppliers").state().equals("ACTIVE"),"供应商已暂停");
